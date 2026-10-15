@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080d10">
+    <title>Koritsu | FRA Works</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='blue-pink-purple') }}">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/koritsu" aria-label="Koritsu home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>KORITSU <strong>FRA WORKS</strong></span>
+      </a>
+      <div class="topbar-right"><span class="connection-dot"></span><span>LOCAL WORKSPACE</span></div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="intro-copy">
+          <p class="eyebrow">PROPERTY COMPLIANCE / 01</p>
+          <h1>Find the work.<br><em>Close the loop.</em></h1>
+          <p class="lede">Match your property register to Fire Risk Assessments, review the findings, and send the right report to the right contact.</p>
+        </div>
+        <div class="intro-stamp" aria-hidden="true"><span>FIRE<br>SAFETY</span><b>FRA</b><i>●</i></div>
+      </section>
+
+      <nav class="steps" aria-label="Workflow">
+        <div class="step active" data-step="1"><span>01</span><b>Import register</b></div>
+        <div class="step" data-step="2"><span>02</span><b>Match & review</b></div>
+        <div class="step" data-step="3"><span>03</span><b>Send reports</b></div>
+      </nav>
+
+      <section class="panel import-panel" id="import-panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">START WITH YOUR REGISTER</p><h2>Bring in properties</h2></div>
+          <span class="section-count">01 / 03</span>
+        </div>
+        <label class="dropzone" id="dropzone" for="spreadsheet">
+          <input id="spreadsheet" type="file" accept=".xlsx,.xlsm">
+          <span class="upload-icon" aria-hidden="true">↑</span>
+          <span class="drop-title">Drop your Excel file here</span>
+          <span class="drop-subtitle">or <u>browse files</u> · .xlsx or .xlsm · up to 20 MB</span>
+        </label>
+        <div class="file-status" id="file-status" aria-live="polite"></div>
+        <a class="sample-download" href="{{ url_for('download_simulation') }}"><span aria-hidden="true">↓</span> Download simulation workbook (.xlsx)</a>
+
+        <div class="mapping-area hidden" id="mapping-area">
+          <div class="mapping-heading"><div><h3>Assign embedded reports</h3><p>Check each property and select the PDF object that belongs to it. The spreadsheet row data is read from your headings.</p></div><span id="row-total" class="row-total"></span></div>
+          <div id="attachment-note" class="attachment-note"></div>
+          <div class="table-wrap import-table-wrap">
+            <table class="import-table"><thead><tr><th>PROPERTY / POSTCODE</th><th>MANAGING AGENT / EMAIL</th><th>FRA REPORT</th><th>INSPECTION / DUE</th><th>NOTES</th></tr></thead><tbody id="import-body"></tbody></table>
+          </div>
+          <div class="mapping-footer"><span id="mapping-error" class="error-message" role="alert"></span><button class="button button-dark" id="analyze-button"><span>Analyze reports</span><span aria-hidden="true">↗</span></button></div>
+        </div>
+      </section>
+
+      <section class="results-section hidden" id="results-section">
+        <div class="section-heading results-heading">
+          <div><p class="eyebrow">ASSESSMENT REGISTER</p><h2>Review reports & works</h2></div>
+          <div class="summary-stats" id="summary-stats"></div>
+        </div>
+        <div class="toolbar">
+          <div class="filters" role="group" aria-label="Filter properties">
+            <button class="filter active" data-filter="all">All <span id="count-all">0</span></button>
+            <button class="filter" data-filter="works">Works found <span id="count-works">0</span></button>
+            <button class="filter" data-filter="review">Review <span id="count-review">0</span></button>
+            <button class="filter" data-filter="clear">No works <span id="count-clear">0</span></button>
+          </div>
+          <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find a property"></label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th class="check-col"><input id="select-visible" type="checkbox" aria-label="Select visible works found"></th><th>PROPERTY / POSTCODE</th><th>MANAGING AGENT / EMAIL</th><th>FRA REPORT</th><th>WORKS STATUS</th><th>INSPECTION / DUE</th><th>NOTES</th></tr></thead>
+            <tbody id="results-body"></tbody>
+          </table>
+          <div class="empty-state hidden" id="empty-state"><span>⌕</span><b>No properties match</b><p>Try another search or filter.</p></div>
+        </div>
+        <div class="results-footer"><span id="selection-note">0 properties selected</span><button class="button button-accent" id="open-email"><span>Prepare emails</span><span aria-hidden="true">↗</span></button></div>
+        <div class="integration-errors hidden" id="integration-errors"></div>
+      </section>
+
+      <section class="email-panel hidden" id="email-panel">
+        <div class="section-heading"><div><p class="eyebrow">FINAL CHECK</p><h2>Prepare the email</h2></div><button class="text-button" id="back-review">← Back to review</button></div>
+        <div class="email-layout">
+          <div class="email-form">
+            <label>OUTLOOK TEMPLATE<select id="email-template"><option value="">Import a template to begin</option></select></label>
+            <div class="template-actions"><label class="button button-outline upload-template">Import .OFT templates<input id="template-files" type="file" accept=".oft" multiple></label><button class="text-button danger-text" id="delete-template" disabled>Remove selected</button></div>
+            <p id="template-note" class="security-note">Templates are kept in this app's local data folder. Select a different template here to switch the email used for this batch.</p>
+            <iframe id="template-preview" class="template-preview hidden" title="Selected Outlook template preview" sandbox></iframe>
+            <div class="graph-connection">
+              <div class="graph-heading"><div><b>Microsoft 365</b><span id="connection-status">Not connected</span></div><span class="connection-dot"></span></div>
+              <div class="settings-grid graph-grid">
+                <label>APP / CLIENT ID<input id="graph-client-id" autocomplete="off" placeholder="Provided by your Microsoft 365 administrator"></label>
+                <label>TENANT ID<input id="graph-tenant-id" autocomplete="off" placeholder="Tenant ID or organizations"></label>
+              </div>
+              <div class="graph-actions"><button class="button button-outline" id="connect-button"><span>Connect Microsoft 365</span><span aria-hidden="true">↗</span></button><span id="auth-message" class="auth-message" aria-live="polite"></span></div>
+              <p class="security-note">Requires an Entra app configured for public-client device-code sign-in and the delegated Mail.Send permission. Disconnect clears Koritsu’s local session; Microsoft-issued access tokens may remain valid until they expire.</p>
+            </div>
+            <div id="send-error" class="error-message" role="alert"></div>
+          </div>
+          <aside class="send-summary"><p class="eyebrow">READY TO SEND</p><div class="send-total"><b id="send-count">0</b><span>emails</span></div><div id="send-list" class="send-list"></div><button class="button button-dark send-button" id="send-button"><span>Send selected reports</span><span aria-hidden="true">↗</span></button><p class="send-warning">Each email uses the selected Outlook template and includes its property's assigned PDF.</p></aside>
+        </div>
+      </section>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </main>
+    <footer><span>KORITSU / FRA WORKS</span><span>Review every match before sending.</span></footer>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </body>
+</html>

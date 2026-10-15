@@ -1,0 +1,5 @@
+Flask>=3.0,<4
+openpyxl>=3.1,<4
+PyMuPDF>=1.24,<2
+extract-msg>=0.48,<0.60
+msal>=1.28,<2
